@@ -1,4 +1,4 @@
-flot-barnumbers-enhanced
+Flot Barnumbers Enhanced
 ========================
 
 Enhanced version of the [flot-barnumbers plugin](https://github.com/joetsoi/flot-barnumbers) by Joe Tsoi for [Flot](http://www.flotcharts.org) with additional options.  The base plugin draws bar chart values on each bar (centered horizontally and vertically by default).  This plugin offers additional options for formatting the numbers, changing the font/color, using a threshold to determine whether to display the numbers above or below the bar, and a pixel-based vertical offset.
