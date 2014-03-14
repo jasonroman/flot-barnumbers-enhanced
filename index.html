@@ -34,7 +34,95 @@
         <h1>
 <a name="flot-barnumbers-enhanced" class="anchor" href="#flot-barnumbers-enhanced"><span class="octicon octicon-link"></span></a>flot-barnumbers-enhanced</h1>
 
-<p>Enhanced version of flot-barnumbers plugin with additional options</p>
+<p>Enhanced version of the <a href="https://github.com/joetsoi/flot-barnumbers">flot-barnumbers plugin</a> by Joe Tsoi for <a href="http://www.flotcharts.org">Flot</a> with additional options.  The base plugin draws bar chart values on each bar (centered horizontally and vertically by default).  This plugin offers additional options for formatting the numbers, changing the font/color, using a threshold to determine whether to display the numbers above or below the bar, and a pixel-based vertical offset.</p>
+
+<p>This project stemmed from needing a few features that the original plugin did not provide:</p>
+
+<ul>
+<li>
+<strong>Issue:</strong> Since the numbers were drawn directly on the graph image, the font could not be altered</li>
+<li><p><strong>Solution:</strong> Use the <em>font</em> and <em>fontColor</em> options to modify the font</p></li>
+<li><p><strong>Issue:</strong> Another issue with the numbers being drawn on the image was that there was no way to format the numbers</p></li>
+<li><p><strong>Solution:</strong> You may define a function and set the <em>formatter</em> option to that function, which will pass it the value of the number, which can then be formatted however is needed</p></li>
+<li><p><strong>Issue:</strong> If the bar itself was very small, the label would overlap the bar.</p></li>
+<li>
+<strong>Solution:</strong> The <em>threshold</em> feature allows values at a certain percentage to display above the bar rather than trying to display inside of it.  This should be a percentage value (such as 0.25) combined with a <em>yAlign</em> value of 0 and a <em>yOffset</em> value (in pixels) if you want some spacing so that the number is not directly on the bar line.</li>
+</ul><p>View the <a href="http://jasonroman.github.io/flot-barnumbers-enhanced/example.html">example page</a> to see these new features of the plugin in action.</p>
+
+<hr><p>Specifying for all series:</p>
+
+<pre><code>series: {
+    bars: {
+        numbers : {
+            show:       boolean - enable or disable the numbers on the bars
+            formatter:  function - formats the value - leave out of options to display as is
+            font:       font - font specification of the number
+            fontColor:  colorspec - color of the number
+            xAlign:     number or function (default) - x-value transform in pixels or as a function
+            yAlign:     number or function (default) - y-value transform in pixels or as a function
+            threshold:  float|false - percentage of maximum chart value with which to display numbers above the chart
+            yOffset:    integer - number of pixels of additional vertical offset to apply to each number
+        }
+    }
+}
+</code></pre>
+
+<p>Specifying for a single series:</p>
+
+<pre><code>$.plot($("#placeholder"), [{
+    data: [ ... ],
+    bars: { numbers: { ... }, ... }
+}])
+</code></pre>
+
+<p>The specifications and description of each option are listed above.  Here are some specific examples of usage:</p>
+
+<p><strong>Using the number formatter to add a '$' sign in front of each value:</strong></p>
+
+<pre><code>var barnumberFormatter = function(value) {
+    return '$' + value;
+}
+
+$.plot('#plot', [{
+    data: [ ... ],
+    bars: { 
+        numbers: {
+            show: true,
+            formatter: barnumberFormatter
+        }
+    }
+]);
+</code></pre>
+
+<p><strong>Using the font feature to alter the font, size, and color of the numbers:</strong></p>
+
+<pre><code>$.plot('#plot', [{
+    data: [ ... ],
+    bars: { 
+        numbers: {
+            show: true,
+            font: '14pt Arial',
+            fontColor: '#FF0000'
+        }
+    }
+]);
+</code></pre>
+
+<p><strong>Using the threshold feature to display values above the bar at a specific percentage threshold:</strong></p>
+
+<pre><code>$.plot('#plot', [{
+    data: [ ... ],
+    bars: { 
+        numbers: {
+            show: true,
+            // all 3 of the following values should be set when using threshold
+            yAlign: 0, // shows numbers at the top of the bar, set to 0
+            threshold: 0.50, // any value lower than 50% of the maximum data point will display above the bar
+            yOffset: 5 // pixel offset so numbers are not right up on the edge of the top of the bar
+        }
+    }
+]);
+</code></pre>
       </section>
     </div>
 
