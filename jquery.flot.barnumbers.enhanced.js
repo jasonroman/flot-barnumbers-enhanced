@@ -185,7 +185,7 @@
     $.plot.plugins.push({
         init: init,
         options: options,
-        name: 'barnumbers',
+        name: 'barnumbers-enhanced',
         version: '1.0'
     });
 
