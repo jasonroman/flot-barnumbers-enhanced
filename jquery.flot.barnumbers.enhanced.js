@@ -8,12 +8,12 @@
  *         numbers : {
  *             show:       boolean
  *             formatter:  function - formats the value - leave out of options to display as is
- *             xAlign:     number or function (default) - x-value transform in pixels or as a function
- *             yAlign:     number or function (default) - y-value transform in pixels or as a function
- *             yOffset:    integer - number of pixels of additional vertical offset to apply to each number
  *             font:       font - font specification of the number
  *             fontColor:  colorspec - color of the number
+ *             xAlign:     number or function (default) - x-value transform in pixels or as a function
+ *             yAlign:     number or function (default) - y-value transform in pixels or as a function
  *             threshold:  float|false - percentage of maximum chart value with which to display numbers above the chart
+ *             yOffset:    integer - number of pixels of additional vertical offset to apply to each number
  *         }
  *     }
  * }
