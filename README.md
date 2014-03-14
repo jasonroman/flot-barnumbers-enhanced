@@ -6,11 +6,9 @@ Enhanced version of the [flot-barnumbers plugin](https://github.com/joetsoi/flot
 This project stemmed from needing a few features that the original plugin did not provide:
 
 * **Issue:** Since the numbers were drawn directly on the graph image, the font could not be altered
-* **Solution:** Use the *font* and *fontColor* options to modify the font
-
+* **Solution:** Use the *font* and *fontColor* options to modify the font<br>&nbsp;
 * **Issue:** Another issue with the numbers being drawn on the image was that there was no way to format the numbers
-* **Solution:** You may define a function and set the *formatter* option to that function, which will pass it the value of the number, which can then be formatted however is needed
-
+* **Solution:** You may define a function and set the *formatter* option to that function, which will pass it the value of the number, which can then be formatted however is needed<br>&nbsp;
 * **Issue:** If the bar itself was very small, the label would overlap the bar.
 * **Solution:** The *threshold* feature allows values at a certain percentage to display above the bar rather than trying to display inside of it.  This should be a percentage value (such as 0.25) combined with a *yAlign* value of 0 and a *yOffset* value (in pixels) if you want some spacing so that the number is not directly on the bar line.
 
