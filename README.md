@@ -18,26 +18,73 @@ View the <a href="http://jasonroman.github.io/flot-barnumbers-enhanced/example.h
 
 ---
 
-To turn on the plugin for all series:
+Specifying for all series:
 
     series: {
         bars: {
             numbers : {
-                show:       boolean
+                show:       boolean - enable or disable the numbers on the bars
                 formatter:  function - formats the value - leave out of options to display as is
-                xAlign:     number or function (default) - x-value transform in pixels or as a function
-                yAlign:     number or function (default) - y-value transform in pixels or as a function
-                yOffset:    integer - number of pixels of additional vertical offset to apply to each number
                 font:       font - font specification of the number
                 fontColor:  colorspec - color of the number
+                xAlign:     number or function (default) - x-value transform in pixels or as a function
+                yAlign:     number or function (default) - y-value transform in pixels or as a function
                 threshold:  float|false - percentage of maximum chart value with which to display numbers above the chart
+                yOffset:    integer - number of pixels of additional vertical offset to apply to each number
             }
         }
     }
 
-The numbers can also be turned on or off for a specific series:
+Specifying for a single series:
 
     $.plot($("#placeholder"), [{
         data: [ ... ],
-        bars: { numbers: { ... } }
+        bars: { numbers: { ... }, ... }
     }])
+
+
+The specifications and description of each option are listed above.  Here are some specific examples of usage:
+
+**Using the number formatter to add a '$' sign in front of each value:**
+
+    var barnumberFormatter = function(value) {
+        return '$' + value;
+    }
+
+    $.plot('#plot', [{
+        data: [ ... ],
+        bars: { 
+            numbers: {
+                show: true,
+                formatter: barnumberFormatter
+            }
+        }
+    ]);
+
+**Using the font feature to alter the font, size, and color of the numbers:**
+
+    $.plot('#plot', [{
+        data: [ ... ],
+        bars: { 
+            numbers: {
+                show: true,
+                font: '14pt Arial',
+                fontColor: '#FF0000'
+            }
+        }
+    ]);
+
+**Using the threshold feature to display values above the bar at a specific percentage threshold:**
+
+    $.plot('#plot', [{
+        data: [ ... ],
+        bars: { 
+            numbers: {
+                show: true,
+                // all 3 of the following values should be set when using threshold
+                yAlign: 0, // shows numbers at the top of the bar, set to 0
+                threshold: 0.50, // any value lower than 50% of the maximum data point will display above the bar
+                yOffset: 5 // pixel offset so numbers are not right up on the edge of the top of the bar
+            }
+        }
+    ]);
