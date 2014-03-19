@@ -57,9 +57,9 @@
                         font: '14pt Arial',
                         fontColor: '#FF0000',
                         // remove the next 3 lines to horizontally center the values
-                        threshold: 0.25,
-                        xAlign: function(x) { return x; },
-                        xOffset: 5
+                        threshold: 0.25, // any value lower than 25% of the maximum data point will display above the bar
+                        xAlign: function(x) { return x; }, // shows numbers at the top of the bar
+                        xOffset: 5 // pixel offset so numbers are not right up on the edge of the top of the bar
                     }
                 }
             }
