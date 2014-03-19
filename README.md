@@ -5,6 +5,8 @@ Enhanced version of the [flot-barnumbers plugin](https://github.com/joetsoi/flot
 
 This project stemmed from needing a few features that the original plugin did not provide:
 
+* **Issue:** The plugin only allowed bar width, xAlign/yAlign, and horizontal to be set globally
+* **Solution:** You may now set all options on a per-series basis
 * **Issue:** Since the numbers were drawn directly on the graph image, the font could not be altered
 * **Solution:** Use the *font* and *fontColor* options to modify the font<br>&nbsp;
 * **Issue:** Another issue with the numbers being drawn on the image was that there was no way to format the numbers
@@ -20,14 +22,15 @@ Specifying for all series:
 
     series: {
         bars: {
-            numbers : {
+            numbers: {
                 show:       boolean - enable or disable the numbers on the bars
                 formatter:  function - formats the value - leave out of options to display as is
                 font:       font - font specification of the number
                 fontColor:  colorspec - color of the number
-                xAlign:     number or function (default) - x-value transform in pixels or as a function
-                yAlign:     number or function (default) - y-value transform in pixels or as a function
-                threshold:  float|false - percentage of maximum chart value with which to display numbers above the chart
+                xAlign:     function - x-value transform - defaults to horizontal center of bar
+                yAlign:     function - y-value transform - defaults to vertical center of bar
+                threshold:  float|false - percentage of maximum chart value with which to display numbers above the bar
+                xOffset:    integer - number of pixels of additional horizontal offset to apply to each number
                 yOffset:    integer - number of pixels of additional vertical offset to apply to each number
             }
         }
@@ -80,9 +83,24 @@ The specifications and description of each option are listed above.  Here are so
             numbers: {
                 show: true,
                 // all 3 of the following values should be set when using threshold
-                yAlign: 0, // shows numbers at the top of the bar, set to 0
                 threshold: 0.50, // any value lower than 50% of the maximum data point will display above the bar
+                yAlign: function(y) { return y; }, // shows numbers at the top of the bar
                 yOffset: 5 // pixel offset so numbers are not right up on the edge of the top of the bar
+            }
+        }
+    ]);
+
+**Using the threshold feature on a horizontal bar chart:**
+
+    $.plot('#plot', [{
+        data: [ ... ],
+        bars: { 
+            numbers: {
+                show: true
+                // all 3 of the following values should be set when using threshold
+                threshold: 0.25, // any value lower than 25% of the maximum data point will display above the bar
+                xAlign: function(x) { return x; }, // shows numbers at the top of the bar
+                xOffset: 5 // pixel offset so numbers are not right up on the edge of the top of the bar
             }
         }
     ]);

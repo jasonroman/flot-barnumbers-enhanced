@@ -7,12 +7,13 @@
  *     bars: {
  *         numbers : {
  *             show:       boolean
- *             formatter:  function - formats the value - leave out of options to display as is
+ *             formatter:  function - formats the value - defaults to just display the value
  *             font:       font - font specification of the number
  *             fontColor:  colorspec - color of the number
- *             xAlign:     number or function (default) - x-value transform in pixels or as a function
- *             yAlign:     number or function (default) - y-value transform in pixels or as a function
- *             threshold:  float|false - percentage of maximum chart value with which to display numbers above the chart
+ *             xAlign:     function - x-value transform - defaults to horizontal center of bar
+ *             yAlign:     function - y-value transform - defaults to vertical center of bar
+ *             threshold:  float|false - percentage of maximum chart value with which to display numbers above the bar
+ *             xOffset:    integer - number of pixels of additional horizontal offset to apply to each number
  *             yOffset:    integer - number of pixels of additional vertical offset to apply to each number
  *         }
  *     }
@@ -60,21 +61,44 @@
         {
             var xAlign, yAlign, horizontalShift, i, minThreshold = 0;
 
-            if (series.bars.horizontal)
-            {
-                xAlign = series.bars.numbers.xAlign || function(x) { return x / 2; };
-                yAlign = series.bars.numbers.yAlign || function(y) { return y + (series.bars.barWidth / 2); };
-                horizontalShift = 0;
+            // shortcut all of the barnumbers-specific options
+            var barnumbers = series.bars.numbers;
+
+            // if user-specified function for xAlign, set that
+            if ($.isFunction(barnumbers.xAlign)) {
+                xAlign = barnumbers.xAlign;
             }
+            // otherwise horizontally center the text in the bar
             else
             {
-                xAlign = series.bars.numbers.xAlign || function(x) { return x + (series.bars.barWidth / 2); };
-                yAlign = series.bars.numbers.yAlign || function(y) { return y / 2; };
-                horizontalShift = 1;
+                if (series.bars.horizontal) {
+                    xAlign = function(x) { return x / 2; };
+                }
+                else {
+                    xAlign = function(x) { return x + (series.bars.barWidth / 2); };
+                }
             }
 
+            // if user-specified function for yAlign, set that
+            if ($.isFunction(barnumbers.yAlign)) {
+                yAlign = barnumbers.yAlign;
+            }
+            // otherwise vertically center the text in the bar
+            else
+            {
+                if (series.bars.horizontal) {
+                    yAlign = function(y) { return y + (series.bars.barWidth / 2); };
+                }
+                else {
+                    yAlign = function(y) { return y / 2; };
+                }
+            }
+
+            // handles horizontal bar shift for stacked bars using the proper access
+            horizontalShift = (series.bars.horizontal) ? 0 : 1;
+
             // make sure this series should show the bar numbers
-            if (!series.bars.numbers.show) {
+            if (!barnumbers.show) {
                 return false;
             }
 
@@ -84,21 +108,18 @@
             var offset      = plot.getPlotOffset();
 
             // set the text font and color and center it
-            ctx.textAlign   = 'center';
-            ctx.font        = series.bars.numbers.font;
-            ctx.fillStyle   = series.bars.numbers.fontColor;
+            ctx.font            = barnumbers.font;
+            ctx.fillStyle       = barnumbers.fontColor;
+            ctx.textBaseline    = 'middle';
+            ctx.textAlign       = 'center';
 
             // if a percentage threshold is defined, set the value that any plot points below that value
             // will display the value above the bar rather than within the bar
-            if (series.bars.numbers.threshold) {
-                minThreshold = Math.max.apply(Math, points) * series.bars.numbers.threshold;
+            if (barnumbers.threshold) {
+                minThreshold = Math.max.apply(Math, points) * barnumbers.threshold;
             }
 
-            // determine how to shift the number values on the axes - not very useful
-            var shiftX  = typeof xAlign === 'number' ? function(x) { return x; } : xAlign;
-            var shiftY  = typeof yAlign === 'number' ? function(y) { return y; } : yAlign;
-
-            // axes and hs are used for shifting x/y values in case this is a horizontal bar chart
+            // axes are used for shifting x/y values in case this is a horizontal bar chart
             var axes = {
                 0 : 'x',
                 1 : 'y'
@@ -108,40 +129,50 @@
             for (i = 0; i < points.length; i += series.datapoints.pointsize)
             {
                 var text;
-                var xOffset = series.bars.numbers.xOffset;
-                var yOffset = series.bars.numbers.yOffset;
-                var barNumber = i + horizontalShift;
+                var xOffset     = barnumbers.xOffset;
+                var yOffset     = barnumbers.yOffset;
+                var barNumber   = i + horizontalShift;
 
                 // decide whether the numbers should be above/below the bar when thresholding
-                // the hard-set 5 and 3 below are extra padding to even out the above/below shifts
-                if (series.bars.numbers.threshold)
+                if (barnumbers.threshold)
                 {
-                    // for horizontal, move numbers to the left if greater than the threshold
-                    if (series.bars.horizontal && points[barNumber] >= minThreshold) {
-                        xOffset = (xOffset * -1) - 5;
-                    }
-                    // for vertical, move numbers above the chart if less than the threshold
-                    else if (!series.bars.horizontal && points[barNumber] < minThreshold)
+                    // for horizontal, move numbers in the bar if greater than the threshold
+                    if (series.bars.horizontal)
                     {
-                        yOffset = (yOffset * -1) + 3;
-                        ctx.textBaseline = 'bottom';
+                        if (points[barNumber] >= minThreshold)
+                        {
+                            xOffset = (xOffset * -1);
+                            ctx.textAlign = 'end';
+                        }
+                        else {
+                            ctx.textAlign = 'start';
+                        }
                     }
-                    else if (!series.bars.horizontal) {
-                        ctx.textBaseline = 'top';
+                    // for vertical, move numbers above the bar if less than the threshold
+                    else
+                    {
+                        if (points[barNumber] < minThreshold)
+                        {
+                            yOffset = (yOffset * -1);
+                            ctx.textBaseline = 'alphabetic';
+                        }
+                        else {
+                            ctx.textBaseline = 'top';
+                        }
                     }
                 }
 
-                // get the point where to display the value
+                // get the point of where the value will be displayed
                 var point = {
-                    'x': shiftX(points[i]),
-                    'y': shiftY(points[i+1])
+                    'x': xAlign(points[i]),
+                    'y': yAlign(points[i+1])
                 };
 
-                // compatibility with the plugin to stack bars (not using === since plugin sets to null explicitly)
+                // set the text equal to the bar value
                 if (series.stack == null || series.stack === false) {
                     text = points[barNumber];
                 }
-                // stacked bars
+                // compatibile with the plugin to stack bars
                 else
                 {
                     point[axes[horizontalShift]] = (points[barNumber] - series.data[i/3][horizontalShift] / 2);
@@ -152,17 +183,18 @@
                 var c = plot.p2c(point);
 
                 // format the number if defined
-                if ($.isFunction(series.bars.numbers.formatter)) {
-                    text = series.bars.numbers.formatter(text);
+                if ($.isFunction(barnumbers.formatter)) {
+                    text = barnumbers.formatter(text);
                 }
 
+                // write the number on the bar
                 ctx.fillText(text.toString(10), c.left + offset.left + xOffset, c.top + offset.top + yOffset);
             }
         });
     }
 
     /**
-     * Initialize the hooks on processing the options and drawing the chart
+     * Initialize the hook on drawing the chart
      * 
      * @param {function} plot - the Flot plot function
      */
