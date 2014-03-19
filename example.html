@@ -8,6 +8,11 @@
     <script src="http://www.flotcharts.org/flot/jquery.flot.js" type="text/javascript"></script>
     <script src="https://raw.github.com/jasonroman/flot-barnumbers-enhanced/master/jquery.flot.barnumbers.enhanced.js" type="text/javascript"></script>
 
+    <style>
+        #left { float: left; }
+        #right { float: right; }
+    </style>
+
     <script type="text/javascript">
 
     $(function() {
@@ -17,11 +22,12 @@
             return '$' + value;
         };
 
-        var d1 = [[0, 3], [1, 8], [2, 5], [3, 13], [4, 10], [5, 5]];
+        var dataVertical    = [[0, 1], [1, 9], [2, 7], [3, 14], [4, 10], [5, 2]];
+        var dataHorizontal  = [[1, 0], [9, 1], [7, 2], [14, 3], [10, 4], [2, 5]];
 
         $.plot("#placeholder", [
             {
-                data: d1,
+                data: dataVertical,
                 bars: {
                     show: true,
                     barWidth: 0.9,
@@ -30,10 +36,30 @@
                         formatter: barnumberFormatter,
                         font: '14pt Arial',
                         fontColor: '#FF0000',
-                        // remove the next 3 lines to center the bars vertically
-                        yAlign: 0,
-                        threshold: 0.50,
-                        yOffset: 5,
+                        // remove the next 3 lines to vertically center the values
+                        threshold: 0.25, // any value < 25% of the maximum data point will display above the bar
+                        yAlign: function(y) { return y; }, // shows numbers at the top of the bar
+                        yOffset: 5 // pixel offset so numbers are not right up on the edge of the top of the bar
+                    }
+                }
+            }
+        ]);
+        $.plot("#placeholder-horizontal", [
+            {
+                data: dataHorizontal,
+                bars: {
+                    show: true,
+                    barWidth: 0.9,
+                    horizontal: true,
+                    numbers: {
+                        show: true,
+                        formatter: barnumberFormatter,
+                        font: '14pt Arial',
+                        fontColor: '#FF0000',
+                        // remove the next 3 lines to horizontally center the values
+                        threshold: 0.25,
+                        xAlign: function(x) { return x; },
+                        xOffset: 5
                     }
                 }
             }
@@ -51,8 +77,12 @@
 
     <div id="content">
 
-        <div class="demo-container">
-            <div id="placeholder" class="demo-placeholder" style="width: 850px; height: 450px"></div>
+        <div id="left" class="demo-container" style="width: 375px; height: 450px;">
+            <div id="placeholder" class="demo-placeholder"></div>
+        </div>
+
+        <div id="right" class="demo-container" style="width: 375px; height: 450px;">
+            <div id="placeholder-horizontal" class="demo-placeholder"></div>
         </div>
 
         <div style="clear: both"></div>
