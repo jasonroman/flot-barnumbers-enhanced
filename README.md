@@ -5,8 +5,8 @@ Enhanced version of the [flot-barnumbers plugin](https://github.com/joetsoi/flot
 
 This project stemmed from needing a few features that the original plugin did not provide:
 
-* **Issue:** The plugin only allowed bar width, xAlign/yAlign, and horizontal to be set globally
-* **Solution:** You may now set all options on a per-series basis
+* **Issue:** The plugin only allowed *barWidth*, *xAlign/yAlign*, and *horizontal* to be set globally
+* **Solution:** You may now set all options on a per-series basis<br>&nbsp;
 * **Issue:** Since the numbers were drawn directly on the graph image, the font could not be altered
 * **Solution:** Use the *font* and *fontColor* options to modify the font<br>&nbsp;
 * **Issue:** Another issue with the numbers being drawn on the image was that there was no way to format the numbers
@@ -108,7 +108,7 @@ The specifications and description of each option are listed above.  Here are so
 
 **Horizontally centering the values while using the <a href="http://www.flotcharts.org/flot/jquery.flot.categories.js">categories plugin</a>:**
 
-The categories plugin converts category names to 0, 1, 2... values, but automatically sets the center of the bar to that value, rather than the start of the bar.  You must use the xAlign function (or yAlign for horizontal bars) to horizontally center the value.
+The categories plugin converts category names to numerical values, but automatically sets the center of the bar to that value rather than the start of the bar.  You must use the xAlign function (or yAlign for horizontal bars) to horizontally center the value.
 
     $.plot('#plot', [{
         data: [ ... ],
