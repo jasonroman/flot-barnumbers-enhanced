@@ -95,12 +95,30 @@ The specifications and description of each option are listed above.  Here are so
     $.plot('#plot', [{
         data: [ ... ],
         bars: { 
+            horizontal: true,
             numbers: {
-                show: true
+                show: true,
                 // all 3 of the following values should be set when using threshold
                 threshold: 0.25, // any value lower than 25% of the maximum data point will display above the bar
                 xAlign: function(x) { return x; }, // shows numbers at the top of the bar
                 xOffset: 5 // pixel offset so numbers are not right up on the edge of the top of the bar
+            }
+        }
+    ]);
+
+**Horizontally centering the values while using the <a href="http://www.flotcharts.org/flot/jquery.flot.categories.js">categories plugin</a>:**
+
+The categories plugin converts category names to 0, 1, 2... values, but automatically sets the center of the bar to that value, rather than the start of the bar.  You must use the xAlign function (or yAlign for horizontal bars) to horizontally center the value.
+
+    $.plot('#plot', [{
+        data: [ ... ],
+        xaxis: {
+            mode: 'categories'
+        },
+        bars: { 
+            numbers: {
+                show: true
+                xAlign: function(x) { return x; },
             }
         }
     ]);
