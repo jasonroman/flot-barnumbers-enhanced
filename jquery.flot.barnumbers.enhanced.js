@@ -41,36 +41,11 @@
             numbers: {
                 show: false,
                 threshold: false,
-                yOffset: 0
+                yOffset: 0,
+                xOffset: 0
             }
         }
     };
-
-    /**
-     * Process the passed-in options and set other options based on chart orientation
-     * 
-     * @param {function} plot - the Flot plot function
-     * @param {Object} options
-     */
-    function processOptions(plot, options)
-    {
-        var bw          = options.series.bars.barWidth;
-        var numbers     = options.series.bars.numbers;
-        var horizontal  = options.series.bars.horizontal;
-
-        if (horizontal)
-        {
-            numbers.xAlign = numbers.xAlign || function(x) { return x / 2; };
-            numbers.yAlign = numbers.yAlign || function(y) { return y + (bw / 2); };
-            numbers.horizontalShift = 0;
-        }
-        else
-        {
-            numbers.xAlign = numbers.xAlign || function(x) { return x + (bw / 2); };
-            numbers.yAlign = numbers.yAlign || function(y) { return y / 2; };
-            numbers.horizontalShift = 1;
-        }
-    }
 
     /**
      * Draw the bar values on the bars
@@ -83,7 +58,20 @@
         // loop through each series
         $.each(plot.getData(), function(index, series)
         {
-            var i, minShowBelow = 0;
+            var xAlign, yAlign, horizontalShift, i, minThreshold = 0;
+
+            if (series.bars.horizontal)
+            {
+                xAlign = series.bars.numbers.xAlign || function(x) { return x / 2; };
+                yAlign = series.bars.numbers.yAlign || function(y) { return y + (series.bars.barWidth / 2); };
+                horizontalShift = 0;
+            }
+            else
+            {
+                xAlign = series.bars.numbers.xAlign || function(x) { return x + (series.bars.barWidth / 2); };
+                yAlign = series.bars.numbers.yAlign || function(y) { return y / 2; };
+                horizontalShift = 1;
+            }
 
             // make sure this series should show the bar numbers
             if (!series.bars.numbers.show) {
@@ -103,15 +91,12 @@
             // if a percentage threshold is defined, set the value that any plot points below that value
             // will display the value above the bar rather than within the bar
             if (series.bars.numbers.threshold) {
-                minShowBelow = Math.max.apply(Math, points) * series.bars.numbers.threshold;
+                minThreshold = Math.max.apply(Math, points) * series.bars.numbers.threshold;
             }
 
             // determine how to shift the number values on the axes - not very useful
-            var xAlign  = series.bars.numbers.xAlign;
-            var yAlign  = series.bars.numbers.yAlign;
-
-            var shiftX  = typeof xAlign === 'number' ? function(x) { return x + xAlign; } : xAlign;
-            var shiftY  = typeof yAlign === 'number' ? function(y) { return y + yAlign; } : yAlign;
+            var shiftX  = typeof xAlign === 'number' ? function(x) { return x; } : xAlign;
+            var shiftY  = typeof yAlign === 'number' ? function(y) { return y; } : yAlign;
 
             // axes and hs are used for shifting x/y values in case this is a horizontal bar chart
             var axes = {
@@ -119,25 +104,31 @@
                 1 : 'y'
             };
 
-            var hs = series.bars.numbers.horizontalShift;
-
             // draw each bar value, either above or below the chart
             for (i = 0; i < points.length; i += series.datapoints.pointsize)
             {
                 var text;
-                var barOffset = series.bars.numbers.yOffset;
-                var barNumber = i + series.bars.numbers.horizontalShift;
+                var xOffset = series.bars.numbers.xOffset;
+                var yOffset = series.bars.numbers.yOffset;
+                var barNumber = i + horizontalShift;
 
-                // decide whether the number should be above or below the chart
-                if (series.bars.numbers.threshold && points[barNumber] < minShowBelow)
+                // decide whether the numbers should be above/below the bar when thresholding
+                // the hard-set 5 and 3 below are extra padding to even out the above/below shifts
+                if (series.bars.numbers.threshold)
                 {
-                    // reverse the offset, but move an extra 3 pixels due to weird ctx 'bottom' padding
-                    barOffset = (barOffset * -1) + 3;
-
-                    ctx.textBaseline = 'bottom';
-                }
-                else {
-                    ctx.textBaseline = 'top';
+                    // for horizontal, move numbers to the left if greater than the threshold
+                    if (series.bars.horizontal && points[barNumber] >= minThreshold) {
+                        xOffset = (xOffset * -1) - 5;
+                    }
+                    // for vertical, move numbers above the chart if less than the threshold
+                    else if (!series.bars.horizontal && points[barNumber] < minThreshold)
+                    {
+                        yOffset = (yOffset * -1) + 3;
+                        ctx.textBaseline = 'bottom';
+                    }
+                    else if (!series.bars.horizontal) {
+                        ctx.textBaseline = 'top';
+                    }
                 }
 
                 // get the point where to display the value
@@ -153,8 +144,8 @@
                 // stacked bars
                 else
                 {
-                    point[axes[hs]] = (points[barNumber] - series.data[i/3][hs] / 2);
-                    text            = series.data[i/3][hs];
+                    point[axes[horizontalShift]] = (points[barNumber] - series.data[i/3][horizontalShift] / 2);
+                    text = series.data[i/3][horizontalShift];
                 }
 
                 // display the value, and add the bar offset if specified
@@ -165,7 +156,7 @@
                     text = series.bars.numbers.formatter(text);
                 }
 
-                ctx.fillText(text.toString(10), c.left + offset.left, c.top + offset.top + barOffset);
+                ctx.fillText(text.toString(10), c.left + offset.left + xOffset, c.top + offset.top + yOffset);
             }
         });
     }
@@ -177,7 +168,6 @@
      */
     function init(plot)
     {
-        plot.hooks.processOptions.push(processOptions);
         plot.hooks.draw.push(draw);
     }
 
