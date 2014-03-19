@@ -5,7 +5,7 @@ Enhanced version of the [flot-barnumbers plugin](https://github.com/joetsoi/flot
 
 This project stemmed from needing a few features that the original plugin did not provide:
 
-* **Issue:** The plugin only allowed bar width, xAlign/yAlign, and horizontal to be set globally
+* **Issue:** The plugin only allowed *barWidth*, *xAlign/yAlign*, and *horizontal* to be set globally
 * **Solution:** You may now set all options on a per-series basis<br>&nbsp;
 * **Issue:** Since the numbers were drawn directly on the graph image, the font could not be altered
 * **Solution:** Use the *font* and *fontColor* options to modify the font<br>&nbsp;
