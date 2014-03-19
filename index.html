@@ -4,11 +4,11 @@
   <head>
     <meta charset='utf-8' />
     <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Flot Barnumbers Enhanced : Enhanced version of flot-barnumbers plugin with additional options" />
+    <meta name="description" content="flot-barnumbers-enhanced : Enhanced version of flot-barnumbers plugin with additional options" />
 
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
-    <title>Flot Barnumbers Enhanced</title>
+    <title>flot-barnumbers-enhanced</title>
   </head>
 
   <body>
@@ -18,7 +18,7 @@
         <header class="inner">
           <a id="forkme_banner" href="https://github.com/jasonroman/flot-barnumbers-enhanced">View on GitHub</a>
 
-          <h1 id="project_title">Flot Barnumbers Enhanced</h1>
+          <h1 id="project_title">flot-barnumbers-enhanced</h1>
           <h2 id="project_tagline">Enhanced version of flot-barnumbers plugin with additional options</h2>
 
             <section id="downloads">
@@ -31,13 +31,18 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
+        <h1>
+<a name="flot-barnumbers-enhanced" class="anchor" href="#flot-barnumbers-enhanced"><span class="octicon octicon-link"></span></a>Flot Barnumbers Enhanced</h1>
 
-<br>
 <p>Enhanced version of the <a href="https://github.com/joetsoi/flot-barnumbers">flot-barnumbers plugin</a> by Joe Tsoi for <a href="http://www.flotcharts.org">Flot</a> with additional options.  The base plugin draws bar chart values on each bar (centered horizontally and vertically by default).  This plugin offers additional options for formatting the numbers, changing the font/color, using a threshold to determine whether to display the numbers above or below the bar, and a pixel-based vertical offset.</p>
 
 <p>This project stemmed from needing a few features that the original plugin did not provide:</p>
 
 <ul>
+<li>
+<strong>Issue:</strong> The plugin only allowed <em>barWidth</em>, <em>xAlign/yAlign</em>, and <em>horizontal</em> to be set globally</li>
+<li>
+<strong>Solution:</strong> You may now set all options on a per-series basis<br> </li>
 <li>
 <strong>Issue:</strong> Since the numbers were drawn directly on the graph image, the font could not be altered</li>
 <li>
@@ -56,14 +61,15 @@
 
 <pre><code>series: {
     bars: {
-        numbers : {
+        numbers: {
             show:       boolean - enable or disable the numbers on the bars
             formatter:  function - formats the value - leave out of options to display as is
             font:       font - font specification of the number
             fontColor:  colorspec - color of the number
-            xAlign:     number or function (default) - x-value transform in pixels or as a function
-            yAlign:     number or function (default) - y-value transform in pixels or as a function
-            threshold:  float|false - percentage of maximum chart value with which to display numbers above the chart
+            xAlign:     function - x-value transform - defaults to horizontal center of bar
+            yAlign:     function - y-value transform - defaults to vertical center of bar
+            threshold:  float|false - percentage of maximum chart value with which to display numbers above the bar
+            xOffset:    integer - number of pixels of additional horizontal offset to apply to each number
             yOffset:    integer - number of pixels of additional vertical offset to apply to each number
         }
     }
@@ -119,9 +125,44 @@ $.plot('#plot', [{
         numbers: {
             show: true,
             // all 3 of the following values should be set when using threshold
-            yAlign: 0, // shows numbers at the top of the bar, set to 0
             threshold: 0.50, // any value lower than 50% of the maximum data point will display above the bar
+            yAlign: function(y) { return y; }, // shows numbers at the top of the bar
             yOffset: 5 // pixel offset so numbers are not right up on the edge of the top of the bar
+        }
+    }
+]);
+</code></pre>
+
+<p><strong>Using the threshold feature on a horizontal bar chart:</strong></p>
+
+<pre><code>$.plot('#plot', [{
+    data: [ ... ],
+    bars: { 
+        horizontal: true,
+        numbers: {
+            show: true,
+            // all 3 of the following values should be set when using threshold
+            threshold: 0.25, // any value lower than 25% of the maximum data point will display above the bar
+            xAlign: function(x) { return x; }, // shows numbers at the top of the bar
+            xOffset: 5 // pixel offset so numbers are not right up on the edge of the top of the bar
+        }
+    }
+]);
+</code></pre>
+
+<p><strong>Horizontally centering the values while using the <a href="http://www.flotcharts.org/flot/jquery.flot.categories.js">categories plugin</a>:</strong></p>
+
+<p>The categories plugin converts category names to numerical values, but automatically sets the center of the bar to that value rather than the start of the bar.  You must use the xAlign function (or yAlign for horizontal bars) to horizontally center the value.</p>
+
+<pre><code>$.plot('#plot', [{
+    data: [ ... ],
+    xaxis: {
+        mode: 'categories'
+    },
+    bars: { 
+        numbers: {
+            show: true
+            xAlign: function(x) { return x; },
         }
     }
 ]);
