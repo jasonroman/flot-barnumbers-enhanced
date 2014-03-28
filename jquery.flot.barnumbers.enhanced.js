@@ -59,7 +59,7 @@
         // loop through each series
         $.each(plot.getData(), function(index, series)
         {
-            var xAlign, yAlign, horizontalShift, i, minThreshold = 0;
+            var xAlign, yAlign, horizontalShift, i;
 
             // shortcut all of the barnumbers-specific options
             var barnumbers = series.bars.numbers;
@@ -113,12 +113,6 @@
             ctx.textBaseline    = 'middle';
             ctx.textAlign       = 'center';
 
-            // if a percentage threshold is defined, set the value that any plot points below that value
-            // will display the value above the bar rather than within the bar
-            if (barnumbers.threshold) {
-                minThreshold = Math.max.apply(Math, points) * barnumbers.threshold;
-            }
-
             // axes are used for shifting x/y values in case this is a horizontal bar chart
             var axes = {
                 0 : 'x',
@@ -132,35 +126,6 @@
                 var xOffset     = barnumbers.xOffset;
                 var yOffset     = barnumbers.yOffset;
                 var barNumber   = i + horizontalShift;
-
-                // decide whether the numbers should be above/below the bar when thresholding
-                if (barnumbers.threshold)
-                {
-                    // for horizontal, move numbers in the bar if greater than the threshold
-                    if (series.bars.horizontal)
-                    {
-                        if (points[barNumber] >= minThreshold)
-                        {
-                            xOffset = (xOffset * -1);
-                            ctx.textAlign = 'end';
-                        }
-                        else {
-                            ctx.textAlign = 'start';
-                        }
-                    }
-                    // for vertical, move numbers above the bar if less than the threshold
-                    else
-                    {
-                        if (points[barNumber] < minThreshold)
-                        {
-                            yOffset = (yOffset * -1);
-                            ctx.textBaseline = 'alphabetic';
-                        }
-                        else {
-                            ctx.textBaseline = 'top';
-                        }
-                    }
-                }
 
                 // get the point of where the value will be displayed
                 var point = {
@@ -179,13 +144,40 @@
                     text = series.data[i/3][horizontalShift];
                 }
 
-                // display the value, and add the bar offset if specified
-                var c = plot.p2c(point);
-
                 // format the number if defined
                 if ($.isFunction(barnumbers.formatter)) {
                     text = barnumbers.formatter(text);
                 }
+
+                // if threshold and horizontal bars, move numbers inside the bar if greater than/equal to the threshold
+                if (barnumbers.threshold && series.bars.horizontal)
+                {
+                    // compares the value against the threshold (x-axis max * user-defined percentage)
+                    if (points[barNumber] >= (plot.getAxes().xaxis.max * barnumbers.threshold))
+                    {
+                        xOffset *= -1;
+                        ctx.textAlign = 'end';
+                    }
+                    else {
+                        ctx.textAlign = 'start';
+                    }
+                }
+                // if threshold and vertical bars, move numbers above the bar if less than the threshold
+                else if (barnumbers.threshold && !series.bars.horizontal)
+                {
+                    // compares the value against the threshold (y-axis max * user-defined percentage)
+                    if (points[barNumber] < (plot.getAxes().yaxis.max * barnumbers.threshold))
+                    {
+                        yOffset *= -1;
+                        ctx.textBaseline = 'alphabetic';
+                    }
+                    else {
+                        ctx.textBaseline = 'top';
+                    }
+                }
+
+                // display the value, and add the bar offset if specified
+                var c = plot.p2c(point);
 
                 // write the number on the bar
                 ctx.fillText(text.toString(10), c.left + offset.left + xOffset, c.top + offset.top + yOffset);
