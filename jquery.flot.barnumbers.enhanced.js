@@ -137,7 +137,7 @@
                 if (series.stack == null || series.stack === false) {
                     text = points[barNumber];
                 }
-                // compatibile with the plugin to stack bars
+                // compatible with the plugin to stack bars
                 else
                 {
                     point[axes[horizontalShift]] = (points[barNumber] - series.data[i/3][horizontalShift] / 2);
