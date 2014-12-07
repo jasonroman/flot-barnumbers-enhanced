@@ -36,17 +36,22 @@
 {
     "use strict";
 
-    // default each series to have the bar numbers feature turned off
     var options = {
         bars: {
             numbers: {
-                show: false,
-                threshold: false,
-                yOffset: 0,
-                xOffset: 0
             }
         }
     };
+
+    function processOptions(plot, options)
+    {
+        var barnumbers = options.series.bars.numbers;
+
+        barnumbers.show = barnumbers.show || false;
+        barnumbers.threshold = barnumbers.threshold || false;
+        barnumbers.xOffset = barnumbers.xOffset || 0;
+        barnumbers.yOffset = barnumbers.yOffset || 0;
+    }
 
     /**
      * Draw the bar values on the bars
@@ -60,9 +65,12 @@
         $.each(plot.getData(), function(index, series)
         {
             var xAlign, yAlign, horizontalShift, i;
-
-            // shortcut all of the barnumbers-specific options
             var barnumbers = series.bars.numbers;
+
+            // make sure this series should show the bar numbers
+            if (!barnumbers.show) {
+                return false;
+            }
 
             // if user-specified function for xAlign, set that
             if ($.isFunction(barnumbers.xAlign)) {
@@ -96,11 +104,6 @@
 
             // handles horizontal bar shift for stacked bars using the proper access
             horizontalShift = (series.bars.horizontal) ? 0 : 1;
-
-            // make sure this series should show the bar numbers
-            if (!barnumbers.show) {
-                return false;
-            }
 
             // variable shortcuts
             var points      = series.datapoints.points;
@@ -192,6 +195,7 @@
      */
     function init(plot)
     {
+        plot.hooks.processOptions.push(processOptions);
         plot.hooks.draw.push(draw);
     }
 
