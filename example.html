@@ -25,9 +25,8 @@
         var dataVertical    = [[0, 1], [1, 9], [2, 7], [3, 14], [4, 10], [5, 2]];
         var dataHorizontal  = [[1, 0], [9, 1], [7, 2], [14, 3], [10, 4], [2, 5]];
 
-        $.plot("#placeholder", [
+        $.plot("#placeholder", [dataVertical],
             {
-                data: dataVertical,
                 bars: {
                     show: true,
                     barWidth: 0.9,
@@ -43,10 +42,10 @@
                     }
                 }
             }
-        ]);
-        $.plot("#placeholder-horizontal", [
+        );
+
+        $.plot("#placeholder-horizontal", [dataHorizontal],
             {
-                data: dataHorizontal,
                 bars: {
                     show: true,
                     barWidth: 0.9,
@@ -63,7 +62,7 @@
                     }
                 }
             }
-        ]);
+        );
     });
 
     </script>
