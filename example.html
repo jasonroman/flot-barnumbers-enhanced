@@ -44,8 +44,9 @@
             }
         );
 
-        $.plot("#placeholder-horizontal", [dataHorizontal],
+        $.plot("#placeholder-horizontal", [
             {
+                data: dataHorizontal,
                 bars: {
                     show: true,
                     barWidth: 0.9,
@@ -61,7 +62,7 @@
                         xOffset: 5 // pixel offset so numbers are not right up on the edge of the top of the bar
                     }
                 }
-            }
+            }]
         );
     });
 
