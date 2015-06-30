@@ -25,7 +25,7 @@
         var dataVertical    = [[0, 1], [1, 9], [2, 7], [3, 14], [4, 10], [5, 2]];
         var dataHorizontal  = [[1, 0], [9, 1], [7, 2], [14, 3], [10, 4], [2, 5]];
 
-        $.plot("#placeholder", [
+        $.plot("#placeholder-vertical", [
             {
                 data: dataVertical,
                 bars: {
@@ -44,6 +44,7 @@
                 }
             }
         ]);
+
         $.plot("#placeholder-horizontal", [
             {
                 data: dataHorizontal,
@@ -78,7 +79,7 @@
     <div id="content">
 
         <div id="left" class="demo-container" style="width: 375px; height: 450px;">
-            <div id="placeholder" class="demo-placeholder"></div>
+            <div id="placeholder-vertical" class="demo-placeholder"></div>
         </div>
 
         <div id="right" class="demo-container" style="width: 375px; height: 450px;">
